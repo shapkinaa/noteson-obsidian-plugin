@@ -21,7 +21,6 @@ const notesonWrapper = {
 		}
 		catch (error) {
 			console.log(error);
-			// throw `${error_header}: ${error}`;
 			throw error;
 		}
 	},
@@ -97,8 +96,6 @@ export interface NotesOnClient {
 
 	getUrl(view: TFile): string;
 
-	// updatePost(view: TFile): Promise<void>;
-
 	deletePost(view: TFile, username: string, password: string): Promise<void>;
 }
 
@@ -145,7 +142,6 @@ export async function createClient(
 
 			return `${baseUrl}/${post.id}`;
 		},
-		// TODO: показывает что заметку удалил, хотя сервер не ответил
 		async deletePost(file: TFile, username: string, password: string) {
 			const post = data.posts[file.path];
 

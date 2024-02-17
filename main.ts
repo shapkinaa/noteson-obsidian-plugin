@@ -34,7 +34,6 @@ export default class NotesOnPlugin extends Plugin {
 		this.addNotesOnCommands()
 		this.registerFileMenuEvent()
 
-		// This adds a settings tab so the user can configure various aspects of the plugin
 		this.addSettingTab(new NotesOnSettingTab(this.app, this));
 	}
 
@@ -52,11 +51,6 @@ export default class NotesOnPlugin extends Plugin {
 	}
 
 	addNotesOnCommands(){
-		// this.addCommand({
-		// 	id: 'noteson.action.listPosts',
-		// 	name: getText('actions.listPosts.name'),
-		// 	callback: () => this.showPublishedPosts(),
-		// })
 		this.addCommand({
 			id: 'noteson.action.create',
 			name: getText('actions.create.name'),
@@ -67,26 +61,6 @@ export default class NotesOnPlugin extends Plugin {
 				this.publishFile(view.file)
 			}
 		})
-		// this.addCommand({
-		// 	id: 'noteson.action.update',
-		// 	name: getText('actions.update.name'),
-		// 	editorCheckCallback: (checking, _, view) => {
-		// 		if (checking){
-		// 			return !!this.notesonClient.getUrl(view.file)
-		// 		}
-		// 		this.updateFile(view.file)
-		// 	}
-		// })
-		// this.addCommand({
-		// 	id: 'noteson.action.copyUrl',
-		// 	name: getText('actions.copyUrl.name'),
-		// 	editorCheckCallback: (checking, _, view) => {
-		// 		if (checking){
-		// 			return !!this.notesonClient.getUrl(view.file)
-		// 		}
-		// 		this.copyUrl(view.file)
-		// 	}
-		// })
 		this.addCommand({
 			id: 'noteson.action.remove',
 			name: getText('actions.remove.name'),
@@ -113,16 +87,6 @@ export default class NotesOnPlugin extends Plugin {
 							);
 					} else {
 						menu
-							// .addItem(item => item
-							// 	.setTitle(getText('actions.update.name'))
-							// 	.setIcon('double-up-arrow-glyph')
-							// 	.onClick(() => this.updateFile(file))
-							// )
-							// .addItem(item => item
-							// 	.setTitle(getText('actions.copyUrl.name'))
-							// 	.setIcon('link')
-							// 	.onClick(() => this.copyUrl(file))
-							// )
 							.addItem(item => item
 								.setTitle(getText('actions.remove.name'))
 								.setIcon('cross')
@@ -149,26 +113,6 @@ export default class NotesOnPlugin extends Plugin {
 		}
 	}
 
-	// async updateFile(file: TFile){
-	// 	try {
-	// 		await this.notesonClient.updatePost(file);
-	// 		new Notice(getText('actions.update.success'));
-	// 	} catch (e) {
-	// 		console.error(e);
-	// 		new Notice(getText('actions.update.failure'));
-	// 	}
-	// }
-
-	// async copyUrl(file: TFile){
-	// 	const url = this.notesonClient.getUrl(file);
-	// 	if (url) {
-	// 		await navigator.clipboard.writeText(url);
-	// 		new Notice(getText('actions.copyUrl.success'));
-	// 	} else {
-	// 		new Notice(getText('actions.copyUrl.failure'));
-	// 	}
-	// }
-
 	async deleteFile(file: TFile){
 		try {
 			await this.notesonClient.deletePost(file, this.settings.username, this.settings.password);
@@ -179,40 +123,3 @@ export default class NotesOnPlugin extends Plugin {
 		}
 	}
 }
-
-// class NotesOnSettingTab extends PluginSettingTab {
-// 	plugin: NotesOnPlugin;
-
-// 	constructor(app: App, plugin: NotesOnPlugin) {
-// 		super(app, plugin);
-// 		this.plugin = plugin;
-// 	}
-
-// 	display(): void {
-// 		const {containerEl} = this;
-
-// 		containerEl.empty();
-
-// 		new Setting(containerEl)
-// 			.setName('Account name')
-// 			.setDesc('User name for NotesOn.ru')
-// 			.addText(text => text
-// 				.setPlaceholder('Enter your user name')
-// 				.setValue(this.plugin.settings.username)
-// 				.onChange(async (value) => {
-// 					this.plugin.settings.username = value;
-// 					await this.plugin.saveSettings();
-// 				}));
-// 		new Setting(containerEl)
-// 			.setName('Account password')
-// 			.setDesc("User's password for NotesOn.ru")
-// 			.addText(text => text
-// 				.setPlaceholder('Enter your password')
-// 				.setValue(this.plugin.settings.password)
-// 				.onChange(async (value) => {
-// 					this.plugin.settings.password = value;
-// 					await this.plugin.saveSettings();
-// 				}));
-// 	}
-// }
-

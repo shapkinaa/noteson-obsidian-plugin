@@ -25,27 +25,11 @@ const strings = flatten({
 			success: 'Note published to NotesOn. URL copied to clipboard.',
 			failure: 'Failed to publish note to NotesOn'
 		},
-		// update: {
-		// 	name: 'Update in NotesOn',
-		// 	success: 'Updated note in NotesOn. It may take a little while before update becomes visible.',
-		// 	failure: 'Failed to update note in NotesOn'
-		// },
-		// copyUrl: {
-		// 	name: 'Copy NotesOn URL',
-		// 	success: 'NotesOn URL copied to clipboard',
-		// 	failure: 'Note not yet published'
-		// },
 		remove: {
 			name: 'Remove from NotesOn',
 			success: 'Note removed from NotesOn',
 			failure: 'Failed to remove note from NotesOn'
 		},
-		// listPosts: {
-		// 	name: 'View published posts',
-		// 	title: 'Published posts',
-		// 	showFile: 'View file',
-		// 	showPost: 'View post',
-		// }
 	},
 	modals: {
 		showUrl: {
