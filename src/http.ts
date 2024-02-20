@@ -6,7 +6,7 @@ export default async function (
 	data: any = null,
 	token: any = null
 ) {
-	var headers = new Headers({
+	let headers = new Headers({
 		Accept: "application/json",
 	});
 	if (data) {
@@ -16,7 +16,7 @@ export default async function (
 		headers.set('Authorization', 'Bearer ' + token);
 	}
 
-	var resp = null;
+	let resp = null;
 	try {
 		resp = await fetch(url, {
 			method,

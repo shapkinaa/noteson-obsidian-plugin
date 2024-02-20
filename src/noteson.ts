@@ -11,7 +11,7 @@ interface CreateResponse {
 
 const notesonWrapper = {
 	async authToBackend(username: string, password: string): string {
-		var error_header = 'Error authorization';
+		let error_header = 'Error authorization';
 
 		try {
 			const url = `${baseUrl}/auth`;
@@ -25,7 +25,7 @@ const notesonWrapper = {
 		}
 	},
 	async createPost(id: string, title: string, content: string, filename: string, username: string, password: string): Promise<CreateResponse> {
-		var token = null;
+		let token = null;
 		try {
 			token = await this.authToBackend(username, password);
 		}
@@ -35,12 +35,12 @@ const notesonWrapper = {
 		}
 		console.log(token);
 
-		var note_filename = filename.replace(/[^a-zA-Z0-9_-]/g,'');
+		let note_filename = filename.replace(/[^a-zA-Z0-9_-]/g,'');
 		if (note_filename == '') {
 			note_filename = null;
 		}
 
-		var response = null;
+		let response = null;
 		try {
 			response = await http('POST', `${baseUrl}/notes`, {
 			 																					note_uid: id,
@@ -61,7 +61,7 @@ const notesonWrapper = {
 		return response;
 	},
 	async deletePost(id: string, secret: string, username: string, password: string): Promise<void> {
-		var token = null;
+		let token = null;
 		try {
 			token = await this.authToBackend(username, password);
 		}
