@@ -3,7 +3,7 @@ import { Notice, Plugin, TFile, PluginSettingTab, Setting } from 'obsidian';
 import type { NotesOnClient } from './src/noteson';
 import { createClient } from './src/noteson';
 import { getText } from './src/text';
-import { PublishedPostsModal } from './src/modals';
+// import { PublishedPostsModal } from './src/modals';
 import { NotesOnSettingTab } from './src/settingtab';
 
 interface NotesOnPluginSettings {
@@ -52,7 +52,7 @@ export default class NotesOnPlugin extends Plugin {
 
 	addNotesOnCommands(){
 		this.addCommand({
-			id: 'noteson.action.create',
+			id: 'action.create',
 			name: getText('actions.create.name'),
 			editorCheckCallback: (checking, _, view) => {
 				if (checking){
@@ -62,7 +62,7 @@ export default class NotesOnPlugin extends Plugin {
 			}
 		})
 		this.addCommand({
-			id: 'noteson.action.remove',
+			id: 'action.remove',
 			name: getText('actions.remove.name'),
 			editorCheckCallback: (checking, _, view) => {
 				if (checking){
@@ -99,9 +99,9 @@ export default class NotesOnPlugin extends Plugin {
 		);
 	}
 
-	showPublishedPosts(){
-		new PublishedPostsModal(this.app, this.notesonClient).open();
-	}
+	// showPublishedPosts(){
+	// 	new PublishedPostsModal(this.app, this.notesonClient).open();
+	// }
 
 	async publishFile(file: TFile){
 		try {

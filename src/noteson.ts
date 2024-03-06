@@ -1,8 +1,8 @@
 import http from './http';
 import { TFile } from 'obsidian';
 
-const baseUrl = "http://noteson.ru:8000";
-// const baseUrl = 'http://localhost:5000';
+// const baseUrl = "http://noteson.ru:8000";
+const baseUrl = 'http://localhost:5000';
 
 interface CreateResponse {
 	id: string;
@@ -33,7 +33,6 @@ const notesonWrapper = {
 			console.log(error);
 			throw error;
 		}
-		console.log(token);
 
 		let note_filename = filename.replace(/[^a-zA-Z0-9_-]/g,'');
 		if (note_filename == '') {
@@ -49,7 +48,6 @@ const notesonWrapper = {
 																								note_title: title,
 																						},
 																						token);
-			console.log(response);
 		}
 		catch (error) {
 			console.log(error);

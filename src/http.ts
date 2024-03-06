@@ -6,34 +6,34 @@ export default async function (
 	data: any = null,
 	token: any = null
 ) {
-	let headers = new Headers({
-		Accept: "application/json",
-	});
-	if (data) {
-		headers.set("Content-Type", "application/json");
-	}
-	if (token) {
-		headers.set('Authorization', 'Bearer ' + token);
-	}
-
 	let resp = null;
 	try {
-		resp = await fetch(url, {
-			method,
-			headers,
-			...(data ? { body: JSON.stringify(data) } : {}),
-		});
+		let headers = {
+			"Accept": "application/json",
+			"Content-Type": (data) ? "application/json": "",
+			"Authorization": (token) ? 'Bearer ' + token: "",
+		}
+
+		const body = (data ? JSON.stringify(data) : {});
+
+		const options: RequestUrlParam = {
+																		    url: url,
+																		    method: method,
+																		    headers: headers,
+																		    body: body,
+																		}
+		resp = await requestUrl(options);
 	} 
 	catch (error) {
 		console.error(error);
 		throw 'Connection to server NotesOn.ru failed';
 	}
 
-	if (!resp.ok) {
-		const resp_body = await resp.text();
-		const message = JSON.parse(resp_body);
+	if (resp.status != 200) {
+		const message = await resp.json;
+
 		throw message['message'];
 	}
 
-	return await resp.json();
+	return await resp.json;
 }
