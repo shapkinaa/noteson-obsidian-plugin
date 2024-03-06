@@ -3,7 +3,6 @@ import { Notice, Plugin, TFile, PluginSettingTab, Setting } from 'obsidian';
 import type { NotesOnClient } from './src/noteson';
 import { createClient } from './src/noteson';
 import { getText } from './src/text';
-// import { PublishedPostsModal } from './src/modals';
 import { NotesOnSettingTab } from './src/settingtab';
 
 interface NotesOnPluginSettings {
@@ -43,10 +42,8 @@ export default class NotesOnPlugin extends Plugin {
 
 	async loadSettings() {
 		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
-		console.log(this.settings)
 	}
 	async saveSettings() {
-		console.log(this.settings)
 		await this.saveData(this.settings);
 	}
 
@@ -98,10 +95,6 @@ export default class NotesOnPlugin extends Plugin {
 			})
 		);
 	}
-
-	// showPublishedPosts(){
-	// 	new PublishedPostsModal(this.app, this.notesonClient).open();
-	// }
 
 	async publishFile(file: TFile){
 		try {
