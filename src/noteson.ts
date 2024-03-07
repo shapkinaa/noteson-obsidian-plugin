@@ -1,8 +1,8 @@
 import http from './http';
 import { TFile } from 'obsidian';
 
-// const baseUrl = "http://noteson.ru:8000";
-const baseUrl = 'http://localhost:5000';
+const baseUrl = "https://api.noteson.ru";
+// const baseUrl = 'http://localhost:5000';
 
 interface CreateResponse {
 	id: string;
