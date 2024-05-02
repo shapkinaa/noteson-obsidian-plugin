@@ -20,6 +20,7 @@ export default class NotesOnPlugin extends Plugin {
 	notesonClient: NotesOnClient;
 
 	async onload() {
+	
 		await this.loadSettings();
 
 		this.notesonClient = await createClient(
@@ -96,13 +97,31 @@ export default class NotesOnPlugin extends Plugin {
 		);
 	}
 
-	async publishFile(file: TFile){
+	async publishFile(file: TFile) {
+		
 		try {
 			const url = await this.notesonClient.createPost(file, this.settings.username, this.settings.password);
 			await navigator.clipboard.writeText(url);
 			new Notice(getText('actions.create.success'));
 		} catch (e) {
 			new Notice(getText('actions.create.failure'));
+		}
+
+		
+		const fileCache = this.app.metadataCache.getFileCache(file)
+		if (!fileCache || !fileCache.embeds) {
+			new Notice('NO FILE CACHE');
+		}
+
+		for (const embed of fileCache.embeds) {
+			const file_emb = this.app.metadataCache.getFirstLinkpathDest(embed.link, file.path)
+			if (!file_emb) {
+				console.warn('file not found', embed.link)
+				return
+			}
+
+			const url = await this.notesonClient.sendFile(file, file_emb.path, this.settings.username, this.settings.password);
+			console.log("url:" + url);
 		}
 	}
 

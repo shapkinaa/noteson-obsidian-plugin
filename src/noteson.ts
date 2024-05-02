@@ -1,9 +1,11 @@
 import http from './http';
-import { TFile } from 'obsidian';
+import { TAbstractFile, FileSystemAdapter, TFile } from 'obsidian';
+const path = require('path');
+const FormData = require('form-data');
+
+import axios from "axios";
 
 const baseUrl = "https://api.noteson.ru";
-
-
 // const baseUrl = 'http://localhost:5000';
 
 interface CreateResponse {
@@ -13,11 +15,7 @@ interface CreateResponse {
 
 const notesonWrapper = {
 	async authToBackend(username: string, password: string): string {
-		let error_header = 'Error authorization';
-
 		try {
-			const url = `${baseUrl}/auth`;
-
 			const response = await http('POST', `${baseUrl}/auth`, {username: username, password: password});
 			return response['access_token'];
 		}
@@ -48,6 +46,7 @@ const notesonWrapper = {
 																								note_content: content,
 																								note_filename: note_filename,
 																								note_title: title,
+																								is_obsidian: true,
 																						},
 																						token);
 		}
@@ -59,6 +58,47 @@ const notesonWrapper = {
 		response.id = id;
 		response.secret = 'idontknowwhatisdoinghere';
 		return response;
+	},
+	
+	async sendFile(file: TFile, file_path: string, username: string, password: string) {
+
+		let adap = file.vault.adapter as FileSystemAdapter;
+		let pathToVault = adap.getBasePath();
+
+		const srcPath = path.join(pathToVault, file_path);
+
+		let token = null;
+		try {
+			token = await this.authToBackend(username, password);
+		}
+		catch (error) {
+			console.log(error);
+			throw error;
+		}
+		console.log('token:' + token);
+
+		const fi: TAbstractFile = await file.vault.getAbstractFileByPath(file_path);
+    if (!fi) {
+        console.log(`failed to load file ${file_path}`);
+        return;
+    }
+
+		const data = await file.vault.readBinary(fi);
+		const blob = new Blob([data]);
+		const big_file = new File([blob], file_path, { type: 'image/png' });
+
+		const formData = new FormData();
+		formData.append('file', big_file, big_file.name);
+
+		axios.post(baseUrl + "/files", formData, {
+			"headers": {
+													'Authorization': 'Bearer ' + token
+													}
+		}).then(res => {
+			console.log(res);
+		}, err => {
+				console.error(err);
+			})
 	},
 	async deletePost(id: string, secret: string, username: string, password: string): Promise<void> {
 		let token = null;
@@ -93,6 +133,8 @@ export interface NotesOnClient {
 	data(): Data;
 
 	createPost(view: TFile, username: string, password: string): Promise<string>;
+
+	sendFile(file: TFile, path: string, username: string, password: string): Promise<string>;
 
 	getUrl(view: TFile): string;
 
@@ -129,6 +171,14 @@ export async function createClient(
 				await saveData(data);
 
 				return response.public_url;
+			} catch (e) {
+				console.error(e);
+				throw e;
+			}
+		},
+		async sendFile(file: TFile, file_path: string, username: string, password: string) {
+			try {
+				const response = await notesonWrapper.sendFile(file, file_path, username, password); 
 			} catch (e) {
 				console.error(e);
 				throw e;
