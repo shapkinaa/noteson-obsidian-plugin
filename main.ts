@@ -76,21 +76,18 @@ export default class NotesOnPlugin extends Plugin {
 			this.app.workspace.on('file-menu', (menu, file) => {
 				if (file instanceof TFile) {
 					menu.addSeparator();
-					if (!this.notesonClient.getUrl(file)) {
-						menu
-							.addItem(item => item
-								.setTitle(getText('actions.create.name'))
-								.setIcon('up-chevron-glyph')
-								.onClick(() => this.publishFile(file))
-							);
-					} else {
-						menu
-							.addItem(item => item
-								.setTitle(getText('actions.remove.name'))
-								.setIcon('cross')
-								.onClick(() => this.deleteFile(file))
-							);
-					}
+					menu
+						.addItem(item => item
+							.setTitle(getText('actions.create.name'))
+							.setIcon('up-chevron-glyph')
+							.onClick(() => this.publishFile(file))
+						);
+					menu
+						.addItem(item => item
+							.setTitle(getText('actions.remove.name'))
+							.setIcon('cross')
+							.onClick(() => this.deleteFile(file))
+						);
 					menu.addSeparator();
 				}
 			})
@@ -112,16 +109,18 @@ export default class NotesOnPlugin extends Plugin {
 		if (!fileCache || !fileCache.embeds) {
 			new Notice('NO FILE CACHE');
 		}
+		else {
+			for (const embed of fileCache.embeds) {
+				const file_emb = this.app.metadataCache.getFirstLinkpathDest(embed.link, file.path)
+				if (!file_emb) {
+					console.warn('file not found', embed.link)
+					return
+				}
 
-		for (const embed of fileCache.embeds) {
-			const file_emb = this.app.metadataCache.getFirstLinkpathDest(embed.link, file.path)
-			if (!file_emb) {
-				console.warn('file not found', embed.link)
-				return
+				// const url = 
+				await this.notesonClient.sendFile(file, file_emb.path, this.settings.username, this.settings.password);
+			// console.log("url:" + url);
 			}
-
-			const url = await this.notesonClient.sendFile(file, file_emb.path, this.settings.username, this.settings.password);
-			console.log("url:" + url);
 		}
 	}
 

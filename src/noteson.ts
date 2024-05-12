@@ -1,12 +1,12 @@
-import http from './http';
+import { http_post, http_post_formdata, http_delete } from './http';
 import { TAbstractFile, FileSystemAdapter, TFile } from 'obsidian';
 const path = require('path');
 const FormData = require('form-data');
 
-import axios from "axios";
+// import axios from "axios";
 
-const baseUrl = "https://api.noteson.ru";
-// const baseUrl = 'http://localhost:5000';
+// const baseUrl = "https://api.noteson.ru";
+const baseUrl = 'http://localhost:5000';
 
 interface CreateResponse {
 	id: string;
@@ -16,8 +16,8 @@ interface CreateResponse {
 const notesonWrapper = {
 	async authToBackend(username: string, password: string): string {
 		try {
-			const response = await http('POST', `${baseUrl}/auth`, {username: username, password: password});
-			return response['access_token'];
+			const response = await http_post(`${baseUrl}/auth`, {username: username, password: password});
+			return response.access_token;
 		}
 		catch (error) {
 			console.log(error);
@@ -41,7 +41,7 @@ const notesonWrapper = {
 
 		let response = null;
 		try {
-			response = await http('POST', `${baseUrl}/notes`, {
+			response = await http_post(`${baseUrl}/notes`, {
 			 																					note_uid: id,
 																								note_content: content,
 																								note_filename: note_filename,
@@ -90,17 +90,9 @@ const notesonWrapper = {
 		const formData = new FormData();
 		formData.append('file', big_file, big_file.name);
 
-		axios.post(baseUrl + "/files", formData, {
-			"headers": {
-													'Authorization': 'Bearer ' + token
-													}
-		}).then(res => {
-			console.log(res);
-		}, err => {
-				console.error(err);
-			})
+		http_post_formdata(`${baseUrl}/files`, formData, token);
 	},
-	async deletePost(id: string, secret: string, username: string, password: string): Promise<void> {
+	async deletePost(id: string, username: string, password: string): Promise<void> {
 		let token = null;
 		try {
 			token = await this.authToBackend(username, password);
@@ -111,7 +103,8 @@ const notesonWrapper = {
 		}
 
 		try {
-			await http('DELETE', `${baseUrl}/note/${id}`, {'secret': 'secret'}, token);
+			await http_delete(`${baseUrl}/note/${id}`, token);
+			// await http('DELETE', `${baseUrl}/note/${id}`, token);
 		}
 		catch (error) {
 			console.error(error);
@@ -136,8 +129,6 @@ export interface NotesOnClient {
 
 	sendFile(file: TFile, path: string, username: string, password: string): Promise<string>;
 
-	getUrl(view: TFile): string;
-
 	deletePost(view: TFile, username: string, password: string): Promise<void>;
 }
 
@@ -150,6 +141,7 @@ export async function createClient(
 	return {
 		data() {
 			return data;
+			// return null;
 		},
 		async getFileId(file: TFile): string {
 			const id = file.name+file.stat.ctime;
@@ -163,14 +155,16 @@ export async function createClient(
 
 			try {
 				const response = await notesonWrapper.createPost(id, title, content, filename, username, password);
+				// const url = await notesonWrapper.createPost(id, title, content, filename, username, password);
 				data.posts[file.path] = {
 					id: response.id,
 					secret: response.secret,
 					url: response.public_url,
 				};
-				await saveData(data);
+				// await saveData(data);
 
 				return response.public_url;
+				// return url;
 			} catch (e) {
 				console.error(e);
 				throw e;
@@ -178,27 +172,23 @@ export async function createClient(
 		},
 		async sendFile(file: TFile, file_path: string, username: string, password: string) {
 			try {
-				const response = await notesonWrapper.sendFile(file, file_path, username, password); 
+				// const response = 
+				await notesonWrapper.sendFile(file, file_path, username, password); 
 			} catch (e) {
 				console.error(e);
 				throw e;
 			}
 		},
-		getUrl(file: TFile): string {
-			const post = data.posts[file.path];
-			if (!post) {
-				return null;
-			}
-
-			return `${baseUrl}/${post.id}`;
-		},
 		async deletePost(file: TFile, username: string, password: string) {
-			const post = data.posts[file.path];
+			// const post = data.posts[file.path];
+
+			const id = await this.getFileId(file);
 
 			try {
-				await notesonWrapper.deletePost(post.id, post.secret, username, password);
-				delete data.posts[file.path];
-				await saveData(data);
+				// await notesonWrapper.deletePost(post.id, post.secret, username, password);
+				await notesonWrapper.deletePost(id, username, password);
+				// delete data.posts[file.path];
+				// await saveData(data);
 			} catch (e) {
 				console.error(e);
 				throw e;
