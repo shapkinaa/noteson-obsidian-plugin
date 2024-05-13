@@ -5,8 +5,8 @@ const FormData = require('form-data');
 
 // import axios from "axios";
 
-// const baseUrl = "https://api.noteson.ru";
-const baseUrl = 'http://localhost:5000';
+const baseUrl = "https://api.noteson.ru";
+// const baseUrl = 'http://localhost:5000';
 
 interface CreateResponse {
 	id: string;
@@ -144,7 +144,7 @@ export async function createClient(
 			// return null;
 		},
 		async getFileId(file: TFile): string {
-			const id = file.name+file.stat.ctime;
+			const id = file.name;
 			return id.replace(/[^a-zA-Z0-9_-]/g,'');
 		},
 		async createPost(file: TFile, username: string, password: string) {
@@ -155,16 +155,13 @@ export async function createClient(
 
 			try {
 				const response = await notesonWrapper.createPost(id, title, content, filename, username, password);
-				// const url = await notesonWrapper.createPost(id, title, content, filename, username, password);
 				data.posts[file.path] = {
 					id: response.id,
 					secret: response.secret,
 					url: response.public_url,
 				};
-				// await saveData(data);
 
 				return response.public_url;
-				// return url;
 			} catch (e) {
 				console.error(e);
 				throw e;
@@ -172,7 +169,6 @@ export async function createClient(
 		},
 		async sendFile(file: TFile, file_path: string, username: string, password: string) {
 			try {
-				// const response = 
 				await notesonWrapper.sendFile(file, file_path, username, password); 
 			} catch (e) {
 				console.error(e);
@@ -180,15 +176,10 @@ export async function createClient(
 			}
 		},
 		async deletePost(file: TFile, username: string, password: string) {
-			// const post = data.posts[file.path];
-
 			const id = await this.getFileId(file);
 
 			try {
-				// await notesonWrapper.deletePost(post.id, post.secret, username, password);
 				await notesonWrapper.deletePost(id, username, password);
-				// delete data.posts[file.path];
-				// await saveData(data);
 			} catch (e) {
 				console.error(e);
 				throw e;
