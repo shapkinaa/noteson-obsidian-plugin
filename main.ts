@@ -7,8 +7,8 @@ import { http_post, http_post_formdata, http_delete } from './src/http';
 
 const path = require('path');
 
-// const baseUrl = "https://api.noteson.ru";
-const baseUrl = 'http://localhost:5000';
+const baseUrl = "https://api.noteson.ru";
+// const baseUrl = 'http://localhost:5000';
 
 interface NotesOnPluginSettings {
 	username: string,
