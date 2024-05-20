@@ -1,7 +1,7 @@
 {
 	"id": "noteson-publish",
 	"name": "NotesOn Publish",
-	"version": "1.0.2",
+	"version": "1.0.3",
 	"minAppVersion": "1.5.12",
 	"description": "Make single notes instantly available on the web.",
 	"author": "Andrey Shapkin",
