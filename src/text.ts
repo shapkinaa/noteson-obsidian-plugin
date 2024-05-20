@@ -21,7 +21,7 @@ const strings = flatten({
 	serviceName: 'NotesOn',
 	actions: {
 		create: {
-			name: 'Publish to NotesOn',
+			name: 'Publish (or Update) note to NotesOn',
 			success: 'Note published to NotesOn. URL copied to clipboard.',
 			failure: 'Failed to publish note to NotesOn'
 		},

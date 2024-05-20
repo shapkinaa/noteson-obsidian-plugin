@@ -3,8 +3,6 @@ import { TAbstractFile, FileSystemAdapter, TFile } from 'obsidian';
 const path = require('path');
 const FormData = require('form-data');
 
-// import axios from "axios";
-
 // const baseUrl = "https://api.noteson.ru";
 const baseUrl = 'http://localhost:5000';
 
@@ -63,9 +61,12 @@ const notesonWrapper = {
 	async sendFile(file: TFile, file_path: string, username: string, password: string) {
 
 		let adap = file.vault.adapter as FileSystemAdapter;
+		// console.log('adap:'+JSON.stringify(adap));
 		let pathToVault = adap.getBasePath();
+		// console.log('pathToVault:'+JSON.stringify(pathToVault));
 
 		const srcPath = path.join(pathToVault, file_path);
+		// console.log('srcPath:'+JSON.stringify(srcPath));
 
 		let token = null;
 		try {

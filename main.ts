@@ -1,9 +1,14 @@
 import { Notice, Plugin, TFile, PluginSettingTab, Setting } from 'obsidian';
 
-import type { NotesOnClient } from './src/noteson';
-import { createClient } from './src/noteson';
 import { getText } from './src/text';
 import { NotesOnSettingTab } from './src/settingtab';
+
+import { http_post, http_post_formdata, http_delete } from './src/http';
+
+const path = require('path');
+
+// const baseUrl = "https://api.noteson.ru";
+const baseUrl = 'http://localhost:5000';
 
 interface NotesOnPluginSettings {
 	username: string,
@@ -17,30 +22,17 @@ const DEFAULT_SETTINGS: NotesOnPluginSettings = {
 export default class NotesOnPlugin extends Plugin {
 	settings: NotesOnPluginSettings;
 
-	notesonClient: NotesOnClient;
-
 	async onload() {
-	
 		await this.loadSettings();
-
-		this.notesonClient = await createClient(
-			async () => ({
-				posts: {},
-				...(await this.loadData()),
-			}),
-			async (data) => await this.saveData(data)
-		);
 
 		this.addNotesOnCommands()
 		this.registerFileMenuEvent()
 
 		this.addSettingTab(new NotesOnSettingTab(this.app, this));
 	}
-
 	async onunload() {
 		await this.saveSettings();
 	}
-
 	async loadSettings() {
 		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
 	}
@@ -53,9 +45,6 @@ export default class NotesOnPlugin extends Plugin {
 			id: 'action.create',
 			name: getText('actions.create.name'),
 			editorCheckCallback: (checking, _, view) => {
-				if (checking){
-					return !this.notesonClient.getUrl(view.file)
-				}
 				this.publishFile(view.file)
 			}
 		})
@@ -63,15 +52,12 @@ export default class NotesOnPlugin extends Plugin {
 			id: 'action.remove',
 			name: getText('actions.remove.name'),
 			editorCheckCallback: (checking, _, view) => {
-				if (checking){
-					return !!this.notesonClient.getUrl(view.file)
-				}
 				this.deleteFile(view.file)
 			}
 		})
 	}
 
-	registerFileMenuEvent(){
+	registerFileMenuEvent() {
 		this.registerEvent(
 			this.app.workspace.on('file-menu', (menu, file) => {
 				if (file instanceof TFile) {
@@ -94,40 +80,105 @@ export default class NotesOnPlugin extends Plugin {
 		);
 	}
 
-	async publishFile(file: TFile) {
-		
-		try {
-			const url = await this.notesonClient.createPost(file, this.settings.username, this.settings.password);
-			await navigator.clipboard.writeText(url);
-			new Notice(getText('actions.create.success'));
-		} catch (e) {
-			new Notice(getText('actions.create.failure'));
-		}
+	async getFileId(file: TFile): string {
+		const id = file.name;
+		return id.replace(/[^a-zA-Z0-9_-]/g,'');
+	}
 
-		
-		const fileCache = this.app.metadataCache.getFileCache(file)
-		if (!fileCache || !fileCache.embeds) {
-			new Notice('NO FILE CACHE');
+	async authToBackend(username: string, password: string): string {
+		try {
+			const response = await http_post(`${baseUrl}/auth`, {username: username, password: password});
+			return response.access_token;
 		}
-		else {
+		catch (error) {
+			console.log(error);
+			throw error;
+		}
+	}
+
+	async publishFile(file: TFile) {
+			const title = file.basename;
+			const filename = file.basename;
+			const content = await file.vault.read(file);
+			const id = await this.getFileId(file);
+			
+			const fileCache = this.app.metadataCache.getFileCache(file)
+			// console.log('fileCache:'+JSON.stringify(fileCache))
+
+			try {
+				const token = await this.authToBackend(this.settings.username, this.settings.password);
+
+				let note_filename = filename.replace(/[^a-zA-Z0-9_-]/g,'');
+				if (note_filename == '') {
+					note_filename = null;
+				}
+
+				const response = await http_post(`${baseUrl}/notes`, {
+					 																					note_uid: id,
+																										note_content: content,
+																										note_filename: note_filename,
+																										note_title: title,
+																										is_obsidian: true,
+																										metadata: JSON.stringify(fileCache),
+																								},
+																								token);
+				await navigator.clipboard.writeText(response.public_url);
+
+				new Notice(getText('actions.create.success'));
+			} 
+			catch (e) {
+				console.error(e);
+				new Notice(getText('actions.create.failure'));
+				return ;
+			}
+		
+		// const fileCache = this.app.metadataCache.getFileCache(file)
+		if (fileCache && fileCache.embeds) {
 			for (const embed of fileCache.embeds) {
+
 				const file_emb = this.app.metadataCache.getFirstLinkpathDest(embed.link, file.path)
 				if (!file_emb) {
 					console.warn('file not found', embed.link)
 					return
 				}
+				else {
+					try {
+							const token = await this.authToBackend(this.settings.username, this.settings.password);
+							// console.log('token:' + token);
 
-				// const url = 
-				await this.notesonClient.sendFile(file, file_emb.path, this.settings.username, this.settings.password);
-			// console.log("url:" + url);
+							const fi: TAbstractFile = await file.vault.getAbstractFileByPath(file_emb.path);
+					    if (!fi) {
+					        console.error(`failed to load file ${file_path}`);
+					        return;
+					    }
+
+							const data = await file.vault.readBinary(fi);
+							const blob = new Blob([data]);
+							const big_file = new File([blob], file_emb.path, { type: 'image/png' });
+
+							const formData = new FormData();
+							formData.append('file', big_file, big_file.name);
+
+							http_post_formdata(`${baseUrl}/files`, formData, token);
+					}
+					catch (e) {
+						console.error(e);
+						throw e;
+					}
+				}
 			}
 		}
 	}
-
+	
 	async deleteFile(file: TFile){
+		const id = await this.getFileId(file);
+
 		try {
-			await this.notesonClient.deletePost(file, this.settings.username, this.settings.password);
-			new Notice(getText('actions.remove.success'));
+				let token = null;
+				token = await this.authToBackend(this.settings.username, this.settings.password);
+
+				await http_delete(`${baseUrl}/note/${id}`, token);
+				new Notice(getText('actions.remove.success'));
 		} catch (e) {
 			console.error(e);
 			new Notice(getText('actions.remove.failure'));
