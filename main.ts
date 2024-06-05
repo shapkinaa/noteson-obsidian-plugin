@@ -7,8 +7,8 @@ import { http_post, http_post_formdata, http_delete } from './src/http';
 
 const path = require('path');
 
-const baseUrl = "https://api.noteson.ru";
-// const baseUrl = 'http://localhost:5000';
+// const baseUrl = "https://api.noteson.ru";
+const baseUrl = 'http://localhost:5000';
 
 interface NotesOnPluginSettings {
 	username: string,
@@ -103,7 +103,18 @@ export default class NotesOnPlugin extends Plugin {
 			const id = await this.getFileId(file);
 			
 			const fileCache = this.app.metadataCache.getFileCache(file)
-			// console.log('fileCache:'+JSON.stringify(fileCache))
+			
+			if (fileCache && fileCache.embeds) {
+				for (let embed of fileCache.embeds) {
+					let file_path = embed.link;
+
+					const file_emb = this.app.metadataCache.getFirstLinkpathDest(embed.link, file.path)
+					if (file_emb) {
+						file_path = file_emb.path
+					}
+					embed['file_path'] = file_path
+				}
+			}
 
 			try {
 				const token = await this.authToBackend(this.settings.username, this.settings.password);
@@ -131,11 +142,9 @@ export default class NotesOnPlugin extends Plugin {
 				new Notice(getText('actions.create.failure'));
 				return ;
 			}
-		
-		// const fileCache = this.app.metadataCache.getFileCache(file)
+
 		if (fileCache && fileCache.embeds) {
 			for (const embed of fileCache.embeds) {
-
 				const file_emb = this.app.metadataCache.getFirstLinkpathDest(embed.link, file.path)
 				if (!file_emb) {
 					console.warn('file not found', embed.link)
@@ -144,7 +153,6 @@ export default class NotesOnPlugin extends Plugin {
 				else {
 					try {
 							const token = await this.authToBackend(this.settings.username, this.settings.password);
-							// console.log('token:' + token);
 
 							const fi: TAbstractFile = await file.vault.getAbstractFileByPath(file_emb.path);
 					    if (!fi) {
