@@ -3,8 +3,8 @@ import { TAbstractFile, FileSystemAdapter, TFile } from 'obsidian';
 const path = require('path');
 const FormData = require('form-data');
 
-// const baseUrl = "https://api.noteson.ru";
-const baseUrl = 'http://localhost:5000';
+const baseUrl = "https://api.noteson.ru";
+// const baseUrl = 'http://localhost:5000';
 
 interface CreateResponse {
 	id: string;

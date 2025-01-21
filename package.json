@@ -1,6 +1,6 @@
 {
 	"name": "noteson-publish-plugin",
-	"version": "1.0.5",
+	"version": "1.0.6",
 	"description": "Publish your notes to NotesOn.ru",
 	"main": "main.js",
 	"scripts": {
