@@ -36,6 +36,10 @@ const strings = flatten({
 			title: 'Note published at:',
 			copy: 'Copy URL',
 		}
+	},
+	feedbacks: {
+		success: 'Feedback send successfully',
+		failure: 'Failed to send feedback to NotesOn'
 	}
 });
 

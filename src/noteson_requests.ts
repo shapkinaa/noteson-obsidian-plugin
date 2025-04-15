@@ -12,29 +12,9 @@ export async function auth_to_noteson(username: string, password: string): Promi
     try {
         let data = { username: username, password: password };
 
-        // let headers = {
-        //     "Accept": "application/json",
-        //     "Content-Type": "application/json",
-        //     "Authorization": "",
-        // }
-
-        // const body = JSON.stringify(data);
-
-        // let response = await axios.post(`${baseUrl}/auth`, 
-        //                         body,
-        //                         {
-        //                             "headers": headers
-        //                         }
-        //                 ).then(result => {
-        //                         console.log(result.data);
-        //                         return result.data;
-        //                     }, error => {
-        //                         console.error(error);
-        //                     });
-        const response = await http_post(`${baseUrl}/auth`,
+        const response = await http_post(
+                                        `${baseUrl}/auth`,
                                         data
-                                        // ,
-                                        // token
                                     );
         console.log(response);
         return response.access_token;
@@ -71,4 +51,20 @@ export async function get_templates(token: string): Promise<any> {
 		const response = await http_get(`${baseUrl}/templates`, token);
 		const templates = JSON.parse(response.templates);
 		return templates;
+}
+
+export async function post_feedback(data: string, token: string): Promise<any> {
+    try {
+        const response = http_post(`${baseUrl}/feedbacks`,
+                                        {
+                                            content: data
+                                        },
+                                        token
+                                    );
+        return response;
+    } 
+    catch (error) {
+        console.error(error);
+        throw 'Connection to server NotesOn.ru failed';
+    }
 }

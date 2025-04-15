@@ -1,15 +1,11 @@
-import { Notice, Plugin, TFile, PluginSettingTab, Setting } from 'obsidian';
+import { Notice, Plugin, TFile } from 'obsidian';
 
 import { getText } from './src/text';
 import { NotesOnSettingTab } from './src/settingtab';
 
-// import { http_post, http_post_formdata, http_delete } from './src/http';
 import { auth_to_noteson, post_note, post_file, delete_note } from './src/noteson_requests';
 
-const path = require('path');
-
-// // const baseUrl = "https://api.noteson.ru";
-// const baseUrl = 'http://localhost:5000';
+// const path = require('path');
 
 interface NotesOnPluginSettings {
     username: string,
@@ -106,7 +102,6 @@ export default class NotesOnPlugin extends Plugin {
         }
 
         try {
-            // const token = await this.authToBackend(this.settings.username, this.settings.password);
             const token = await auth_to_noteson(this.settings.username, this.settings.password);
 
             let note_filename = filename.replace(/[^a-zA-Z0-9_-]/g,'');
@@ -114,17 +109,6 @@ export default class NotesOnPlugin extends Plugin {
                 note_filename = null;
             }
 
-            // const response = await http_post(`${baseUrl}/notes`, 
-            //                                     {
-            //                                         note_uid: id,
-            //                                         note_content: content,
-            //                                         note_filename: note_filename,
-            //                                         note_title: title,
-            //                                         is_obsidian: true,
-            //                                         metadata: JSON.stringify(fileCache),
-            //                                     },
-            //                                     token
-            //                                 );
             const response = await post_note(
                                                 {
                                                     note_uid: id,
@@ -155,7 +139,6 @@ export default class NotesOnPlugin extends Plugin {
                 }
                 else {
                     try {
-                        // const token = await this.authToBackend(this.settings.username, this.settings.password);
                         const token = await auth_to_noteson(this.settings.username, this.settings.password);
 
                         const fi: TAbstractFile = await file.vault.getAbstractFileByPath(file_emb.path);
@@ -171,7 +154,6 @@ export default class NotesOnPlugin extends Plugin {
                         const formData = new FormData();
                         formData.append('file', big_file, big_file.name);
 
-                        // http_post_formdata(`${baseUrl}/files`, formData, token);
                         post_file(formData, token);
                     }
                     catch (error) {
@@ -187,11 +169,8 @@ export default class NotesOnPlugin extends Plugin {
         const id = this.getFileId(file);
 
         try {
-            // let token = null;
-            // token = await this.authToBackend(this.settings.username, this.settings.password);
             const token = await auth_to_noteson(this.settings.username, this.settings.password);
 
-            // await http_delete(`${baseUrl}/note/${id}`, token);
             await delete_note(id, token);
 
             new Notice(getText('actions.remove.success'));

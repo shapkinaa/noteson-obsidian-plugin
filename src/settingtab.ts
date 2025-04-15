@@ -1,6 +1,13 @@
-import { Notice, Plugin, TFile, PluginSettingTab, Setting } from 'obsidian';
+import { App, Modal, Notice, PluginSettingTab, Setting } from 'obsidian';
 
-import { auth_to_noteson, get_templates } from './noteson_requests';
+import { auth_to_noteson, get_templates, post_feedback } from './noteson_requests';
+
+import { getText } from './text';
+
+import NotesOnPlugin from 'main';
+// import { text } from 'stream/consumers';
+
+import { FeedbackModal } from './feedbackmodal';
 
 export class NotesOnSettingTab extends PluginSettingTab {
     plugin: NotesOnPlugin;
@@ -19,52 +26,47 @@ export class NotesOnSettingTab extends PluginSettingTab {
             .setName('Account name')
             .setDesc('User name for NotesOn.ru')
             .addText(text => text
-            .setPlaceholder('Enter your user name')
-            .setValue(this.plugin.settings.username)
-            .onChange(async (value) => {
-                        this.plugin.settings.username = value;
-                        await this.plugin.saveSettings();
-            }));
+                .setPlaceholder('Enter your user name')
+                .setValue(this.plugin.settings.username)
+                .onChange(async (value) => {
+                            this.plugin.settings.username = value;
+                            await this.plugin.saveSettings();
+                })
+            );
         new Setting(containerEl)
             .setName('Account password')
             .setDesc("User's password for NotesOn.ru")
             .addText(text => text
-            .setPlaceholder('Enter your password')
-            .setValue(this.plugin.settings.password)
-            .onChange(async (value) => {
-                        this.plugin.settings.password = value;
-                        await this.plugin.saveSettings();
-            }));
+                .setPlaceholder('Enter your password')
+                .setValue(this.plugin.settings.password)
+                .onChange(async (value) => {
+                            this.plugin.settings.password = value;
+                            await this.plugin.saveSettings();
+                })
+            );
 
-        const book = containerEl.createEl("div");
-        book.createEl("div", 
-            { 
+        const warning = containerEl.createEl("div");
+        warning.createEl("div", 
+                { 
                     text: "I know, this is insecure, but Obsidian don't have input[type=password] and any tools for secrets"
                 }
             );
 
         let options: Record<string, Set<string>> = {};
         try {
-            // const token = await authToBackend(this.plugin.settings.username, this.plugin.settings.password);
             const token = await auth_to_noteson(this.plugin.settings.username, this.plugin.settings.password);
 
-            // const response = await http_get(`http://localhost:5000/templates`, token);
-            // let templates = JSON.parse(response.templates);
             const templates = await get_templates(token);
             console.log(templates);
 
             templates.forEach((item: any) => options[item.id] = item.name);
-
-            // new Notice(getText('actions.create.success'));
         }
         catch (e) {
             console.error(e);
-            // new Notice(getText('actions.create.failure'));
             return ;
         }
 
-        console.log(options);
-
+/*
         new Setting(containerEl)
             .setName('Current template')
             .setDesc('Choose current template to publish your notes')
@@ -74,6 +76,33 @@ export class NotesOnSettingTab extends PluginSettingTab {
                                     this.plugin.settings.repetitions = value;
                                     await this.plugin.saveSettings();
             })});
+*/
+
+        new Setting(containerEl)
+        .setName('Feedback')
+        .setDesc('Send your feedback to NotesOn.ru')
+        .addButton(button => {
+            button.setButtonText('Send feedback');
+            button.onClick(async(value) => {
+                new FeedbackModal(this.app, async(result) => {
+                    try {
+                        const token = await auth_to_noteson(this.plugin.settings.username, this.plugin.settings.password);
+
+                        const response = await post_feedback(
+                                                            result,
+                                                            token
+                                                        );
+                        console.log(response);
+                        new Notice(getText('feedbacks.success'));
+                    } 
+                    catch (e) {
+                        console.error(e);
+                        new Notice(getText('feedbacks.failure'));
+                    }
+                }).open();
+            })
+        });
+
     }
 }
 
