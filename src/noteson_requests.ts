@@ -68,11 +68,3 @@ export async function post_feedback(data: string, token: string): Promise<any> {
         throw 'Connection to server NotesOn.ru failed';
     }
 }
-
-export async function check_new_version(token: string, current_version: string): Promise<any> {
-    const response = await http_get(`${baseUrl}/versions/check`, token, {
-        "plugin": "obsidian",
-        "version": current_version
-    });
-    return response;
-}
