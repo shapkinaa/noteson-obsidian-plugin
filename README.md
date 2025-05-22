@@ -1,6 +1,6 @@
 # Obsidian Exports Plugin to NotesOn.ru server
 
-This is a obsidian plugin that exports selected note from [Obsidian](https://obsidian.md) as html file.
+This is a obsidian plugin that exports selected note (single) from [Obsidian](https://obsidian.md) as html file.
 
 
 ## How it can be useful for you ?

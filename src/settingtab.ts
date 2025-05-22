@@ -22,6 +22,21 @@ export class NotesOnSettingTab extends PluginSettingTab {
 
         containerEl.empty();
 
+        if (this.plugin.settings.new_version != this.plugin.settings.current_version) {
+            const updateMessage = containerEl.createEl("div");
+            updateMessage.createEl("div", 
+                    { 
+                        text: "Update your plugin. New version is "+this.plugin.settings.new_version
+                    }
+                );
+            updateMessage.createEl("a", 
+                { 
+                    href: "https://noteson.ru/whatsnew",
+                    text: "whatsnew"
+                }
+            );
+        }
+
         new Setting(containerEl)
             .setName('Account name')
             .setDesc('User name for NotesOn.ru')
@@ -52,7 +67,7 @@ export class NotesOnSettingTab extends PluginSettingTab {
                 }
             );
 
-        let options: Record<string, Set<string>> = {};
+        const options: Record<string, Set<string>> = {};
         try {
             const token = await auth_to_noteson(this.plugin.settings.username, this.plugin.settings.password);
 

@@ -3,17 +3,21 @@ import { Notice, Plugin, TFile } from 'obsidian';
 import { getText } from './src/text';
 import { NotesOnSettingTab } from './src/settingtab';
 
-import { auth_to_noteson, post_note, post_file, delete_note } from './src/noteson_requests';
+import { auth_to_noteson, post_note, post_file, delete_note, check_new_version } from './src/noteson_requests';
 
 // const path = require('path');
 
 interface NotesOnPluginSettings {
     username: string,
     password: string,
+    current_version: string,
+    new_version: string,
 }
 const DEFAULT_SETTINGS: NotesOnPluginSettings = {
     username: '',
     password: '',
+    current_version: '1.0.0',
+    new_version: '',
 }
 
 export default class NotesOnPlugin extends Plugin {
@@ -26,6 +30,24 @@ export default class NotesOnPlugin extends Plugin {
         this.registerFileMenuEvent()
 
         this.addSettingTab(new NotesOnSettingTab(this.app, this));
+
+        // try {
+        //     const token = await auth_to_noteson(this.settings.username, this.settings.password);
+
+        //     const response = await check_new_version(token, this.settings.current_version);
+        //     this.settings.new_version = response.version
+                            
+        //     if (response.version != this.settings.current_version) {
+        //         const message = '[NotesOn Publish plugin]\nNew version (' + response.version + ') of plugin available\nPlease update...';
+        //         new Notice(message);
+        //     }
+        // } 
+        // catch (e) {
+        //     console.error(e);
+        //     new Notice(getText('actions.create.failure'));
+        //     return ;
+        // }
+
     }
     async onunload() {
         await this.saveSettings();

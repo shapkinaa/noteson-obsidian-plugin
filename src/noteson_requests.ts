@@ -5,8 +5,8 @@ const FormData = require('form-data');
 import { http_get, http_post, http_post_formdata, http_delete } from './http';
 
 
-const baseUrl = "https://api.noteson.ru";
-// const baseUrl = 'http://localhost:5000';
+// const baseUrl = "https://api.noteson.ru";
+const baseUrl = 'http://localhost:5000';
 
 export async function auth_to_noteson(username: string, password: string): Promise<string> {
     try {
@@ -67,4 +67,12 @@ export async function post_feedback(data: string, token: string): Promise<any> {
         console.error(error);
         throw 'Connection to server NotesOn.ru failed';
     }
+}
+
+export async function check_new_version(token: string, current_version: string): Promise<any> {
+    const response = await http_get(`${baseUrl}/versions/check`, token, {
+        "plugin": "obsidian",
+        "version": current_version
+    });
+    return response;
 }

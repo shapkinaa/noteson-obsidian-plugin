@@ -1,17 +1,18 @@
-const FormData = require('form-data');
+// const FormData = require('form-data');
 
 import axios from "axios";
 
-export async function http_get(url: string, token: any = null): Promise<any> {
+export async function http_get(url: string, token: any = null, params: any = null): Promise<any> {
     try {
-        let headers = {
+        const headers = {
             "Accept": "application/json",
             "Authorization": 'Bearer ' + token,
         }
 
-        let response = await axios.get(url,
+        const response = await axios.get(url,
                                 {
-                                    "headers": headers
+                                    "headers": headers,
+                                    "params": params
                                 }
                             ).then(result => {
                                     return result.data;
@@ -29,7 +30,7 @@ export async function http_get(url: string, token: any = null): Promise<any> {
 
 export async function http_post(url: string, data: any = null, token: any = null): Promise<any> {
     try {
-        let headers = {
+        const headers = {
             "Accept": "application/json",
             "Content-Type": (data) ? "application/json": "",
             "Authorization": (token) ? 'Bearer ' + token: "",
@@ -37,7 +38,7 @@ export async function http_post(url: string, data: any = null, token: any = null
 
         const body = (data ? JSON.stringify(data) : {});
 
-        let response = await axios.post(url, 
+        const response = await axios.post(url, 
                                 body,
                                 {
                                     "headers": headers
@@ -58,7 +59,7 @@ export async function http_post(url: string, data: any = null, token: any = null
 
 export async function http_post_formdata(url: string, formdata: FormData, token: string): Promise<any> {
     try {
-        let response = await axios.post(url, 
+        const response = await axios.post(url, 
                                         formdata,
                                         {
                                             "headers": {
@@ -81,7 +82,7 @@ export async function http_post_formdata(url: string, formdata: FormData, token:
 
 export async function http_delete(url: string,	token: string): Promise<any> {
     try {
-        let response = await axios.delete(url,
+        const response = await axios.delete(url,
                                         {
                                             headers: {
                                                 "Accept": "application/json",

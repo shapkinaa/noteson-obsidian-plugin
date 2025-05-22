@@ -15,7 +15,7 @@ function flatten(obj: Record<string, any>) {
 	}
 
 	return result;
-};
+}
 
 const strings = flatten({
 	serviceName: 'NotesOn',
