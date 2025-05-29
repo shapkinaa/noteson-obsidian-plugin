@@ -68,8 +68,16 @@ export async function http_post_formdata(url: string, formdata: FormData, token:
                                         }
                                     ).then(result => {
                                             console.log(result);
+                                            return result;
                                         }, error => {
-                                            console.error(error);
+                                            if (error.response.status == 303) {
+                                                return {
+                                                    'status': 303
+                                                }
+                                            }
+
+                                            // console.log(error)
+                                            return error;
                                         }
                                     );
         return response;

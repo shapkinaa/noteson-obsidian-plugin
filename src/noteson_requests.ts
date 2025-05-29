@@ -16,7 +16,6 @@ export async function auth_to_noteson(username: string, password: string): Promi
                                         `${baseUrl}/auth`,
                                         data
                                     );
-        console.log(response);
         return response.access_token;
     } 
     catch (error) {
@@ -38,9 +37,22 @@ export async function post_note(data: any, token: string): Promise<any> {
         throw 'Connection to server NotesOn.ru failed';
     }
 }
+export async function post_inline_note(data: any, token: string): Promise<any> {
+    try {
+        const response = http_post(`${baseUrl}/inline/notes`,
+                                        data,
+                                        token
+                                    );
+        return response;
+    } 
+    catch (error) {
+        console.error(error);
+        throw 'Connection to server NotesOn.ru failed';
+    }
+}
 
-export async function post_file(file: FormData, token: string): Promise<void> {
-    http_post_formdata(`${baseUrl}/files`, file, token);
+export async function post_file(file: FormData, token: string): Promise<any> {
+    return await http_post_formdata(`${baseUrl}/files`, file, token);
 }
 
 export async function delete_note(id: any, token: string): Promise<void> {
