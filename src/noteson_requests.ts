@@ -64,6 +64,11 @@ export async function get_templates(token: string): Promise<any> {
 		const templates = JSON.parse(response.templates);
 		return templates;
 }
+export async function get_notes(token: string): Promise<any> {
+		const response = await http_get(`${baseUrl}/notes`, token);
+		const result = JSON.parse(response.notes);
+        return result;
+}
 
 export async function post_feedback(data: string, token: string): Promise<any> {
     try {

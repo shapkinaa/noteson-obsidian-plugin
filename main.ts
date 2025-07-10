@@ -5,6 +5,19 @@ import { NotesOnSettingTab } from './src/settingtab';
 
 import { auth_to_noteson, post_note, post_inline_note, post_file, delete_note} from './src/noteson_requests';
 
+interface Manifest {
+    id: string;
+    name: string;
+    version: string;
+    minAppVersion: string;
+    description: string;
+    author: string;
+    authorUrl: string;
+    isDesktopOnly: boolean;
+    js: string;
+    css: string;
+}
+
 
 interface NotesOnPluginSettings {
     username: string,
@@ -24,11 +37,27 @@ const DEFAULT_SETTINGS: NotesOnPluginSettings = {
 export default class NotesOnPlugin extends Plugin {
     settings: NotesOnPluginSettings;
 
+    async loadManifest() {
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        // TODO need to merge with check_version branch
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        const manifest: Manifest = require('./manifest.json');
+
+        // Access manifest data
+        // console.log(`Plugin ID: ${manifest.id}`);
+        // console.log(`Plugin Name: ${manifest.name}`);
+        // console.log(`Plugin Version: ${manifest.version}`);
+        // console.log(`Plugin Description: ${manifest.description}`);
+        /////////////////////////////////////////////////////////////////////////////////////////////
+    }
+
     async onload() {
         await this.loadSettings();
 
-        this.addNotesOnCommands()
-        this.registerFileMenuEvent()
+        this.addNotesOnCommands();
+        this.registerFileMenuEvent();
+
+        this.loadManifest();
 
         this.addSettingTab(new NotesOnSettingTab(this.app, this));
     }
