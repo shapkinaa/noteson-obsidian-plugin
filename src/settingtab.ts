@@ -22,6 +22,11 @@ export class NotesOnSettingTab extends PluginSettingTab {
 
         containerEl.empty();
 
+        containerEl.createEl("h3", { text: "Donations" });
+        const donations_href = sanitizeHTMLToDom(`<a href="https://www.donationalerts.com/r/shapkinaa">donationalerts.com</a>`);
+        containerEl.appendChild(donations_href)
+
+
         containerEl.createEl("h3", { text: "User Account" });
 
         new Setting(containerEl)
@@ -161,7 +166,7 @@ export class NotesOnSettingTab extends PluginSettingTab {
 
         dom = sanitizeHTMLToDom(`
             <textarea readonly style='width: 100%; height: 200px'>
-29 june 2025
+9 july 2025
 - [Obsidian] Rebuilded plugin settings tab. Password input element is secured now
 
 30 may 2025
