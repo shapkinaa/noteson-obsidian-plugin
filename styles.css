@@ -16,3 +16,13 @@
 .hidden {
 	display: none;
 }
+
+.tariffs_table, .tariffs_table td, .tariffs_table tr {
+  border: 1px solid black;
+  border-collapse: collapse;
+  padding: 15px;
+}
+
+.inactive_text {
+  color: #aaa;
+}
