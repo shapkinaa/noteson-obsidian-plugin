@@ -50,10 +50,10 @@ export class NotesOnSettingTab extends PluginSettingTab {
             <td>unlimited</td>
         </tr>
         <tr>
-            <td class="inactive_text" style="color: #aaa;">NotesOn Copyright (planned)</td>
-            <td class="inactive_text" style="color: #aaa;">hosted</td>
-            <td class="inactive_text" style="color: #aaa;">not hosted</td>
-            <td class="inactive_text" style="color: #aaa;">not hosted</td>
+            <td style="color: #aaa;">NotesOn Copyright (planned)</td>
+            <td style="color: #aaa;">hosted</td>
+            <td style="color: #aaa;">not hosted</td>
+            <td style="color: #aaa;">not hosted</td>
         </tr>
         <tr>
             <td class="inactive_text" style="color: #aaa;">Custom templates (planned)</td>
